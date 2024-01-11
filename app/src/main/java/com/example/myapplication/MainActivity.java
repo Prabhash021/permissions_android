@@ -122,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+
     public void checkPermission(String permission, int requestCode) {
 
         if (ContextCompat.checkSelfPermission(MainActivity.this, permission) == PackageManager.PERMISSION_DENIED) {
