@@ -50,7 +50,10 @@ public class MainActivity extends AppCompatActivity {
     private static final String CHANNEL_ID = "my_channel";
 //    private NotificationManager notificationManager;
 
-//    private boolean isPermissionGranted = false;
+    private boolean isCamPermissionGranted = false;
+    private boolean isLocPermissionGranted = false;
+    private boolean isNofyPermissionGranted = false;
+
     Button locPerm;
 
     FusedLocationProviderClient fusedLocationProviderClient;
@@ -59,9 +62,10 @@ public class MainActivity extends AppCompatActivity {
     String[] appPermission = {Manifest.permission.CAMERA,
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.POST_NOTIFICATIONS};
-    int[] n = {CAMERA_PERMISSION_CODE,
+
+    /*int[] n = {CAMERA_PERMISSION_CODE,
             LOCATION_PERMISSION_CODE,
-            NOTIFICATION_PERMISSION_CODE};
+            NOTIFICATION_PERMISSION_CODE};*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,14 +78,15 @@ public class MainActivity extends AppCompatActivity {
 
         rLocation = findViewById(R.id.textView2);
 
-        if(checkAndRequestPermission()){
-
-        }
+        /*if(checkAndRequestPermission()){
+            toast("Requests done");
+        }*/
 
         camPerm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 checkPermission(Manifest.permission.CAMERA, CAMERA_PERMISSION_CODE);
+
 
             }
         });
@@ -103,25 +108,23 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public boolean checkAndRequestPermission(){
+    /*public boolean checkAndRequestPermission() {
         List<String> listOfPermissions = new ArrayList<>();
-        for (String perm : appPermission){
-            if(ContextCompat.checkSelfPermission(this, perm) != PackageManager.PERMISSION_GRANTED){
+        for (String perm : appPermission) {
+            if (ContextCompat.checkSelfPermission(this, perm) != PackageManager.PERMISSION_GRANTED) {
                 listOfPermissions.add(perm);
             }
         }
-        if(!listOfPermissions.isEmpty()){
+        if (!listOfPermissions.isEmpty()) {
             ActivityCompat.requestPermissions(MainActivity.this, listOfPermissions.toArray(new String[listOfPermissions.size()]), PERMISSION_CODE);
             return false;
         }
         return true;
-    }
+    }*/
+
     public void checkPermission(String permission, int requestCode) {
 
-        if (ContextCompat.checkSelfPermission(MainActivity.this, permission) == PackageManager.PERMISSION_DENIED) {
-            permReq();
-
-        } else {
+        if(ActivityCompat.checkSelfPermission(MainActivity.this,permission) == PackageManager.PERMISSION_GRANTED) {
             if (requestCode == CAMERA_PERMISSION_CODE) {
                 Intent intent = new Intent(MainActivity.this, MainActivity2.class);
                 startActivities(new Intent[]{intent});
@@ -130,6 +133,51 @@ public class MainActivity extends AppCompatActivity {
             } else if (requestCode == NOTIFICATION_PERMISSION_CODE) {
                 addNotification();
             }
+        }else if(ActivityCompat.shouldShowRequestPermissionRationale(this, permission)){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Please provide permission")
+                    .setTitle("Need Permission")
+                    .setPositiveButton("Ok",((dialog, which) -> {
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission},requestCode);
+                        dialog.dismiss();
+                    }))
+                    .setNegativeButton("Cancel",((dialog, which) -> dialog.dismiss()));
+            builder.show();
+        }else {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission},requestCode);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.e(TAG, "onRequestPermissionsResult > " + requestCode + " / " + grantResults.length);
+        if (requestCode == CAMERA_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Intent intent = new Intent(MainActivity.this, MainActivity2.class);
+                startActivities(new Intent[]{intent});
+            } else if(!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+                Redirct();
+            }else {
+                toast("Camera Permission denied");
+            }
+        } else if (requestCode == LOCATION_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getLocation();
+            } else if(!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                Redirct();
+            }else {
+                toast("Location permission denied");
+            }
+        } else if (requestCode == NOTIFICATION_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                addNotification();
+            } else if(!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)) {
+                Redirct();
+            }else {
+                toast("Notification Permission denied");
+            }
+
         }
     }
 
@@ -176,16 +224,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void toast(String op,String msg) {
-        Toast.makeText(this, op + "permission" + msg, Toast.LENGTH_SHORT).show();
+    private void toast(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
     private void permReq() {
+
+    }
+    private void Redirct() {
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle("Alert!");
         alertDialog.setMessage("Please provide permissions");
-
-        alertDialog.setButton(Dialog.BUTTON_POSITIVE, "Continue..", new DialogInterface.OnClickListener() {
+        alertDialog.setButton(Dialog.BUTTON_POSITIVE, "Setting", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                         Uri.fromParts("package", getPackageName(), null));
@@ -195,5 +245,6 @@ public class MainActivity extends AppCompatActivity {
         });
         alertDialog.show();
     }
+
 
 }
