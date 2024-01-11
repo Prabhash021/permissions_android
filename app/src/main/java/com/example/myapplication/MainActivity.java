@@ -50,9 +50,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String CHANNEL_ID = "my_channel";
 //    private NotificationManager notificationManager;
 
-    private boolean isCamPermissionGranted = false;
+    /*private boolean isCamPermissionGranted = false;
     private boolean isLocPermissionGranted = false;
-    private boolean isNofyPermissionGranted = false;
+    private boolean isNofyPermissionGranted = false;*/
 
     Button locPerm;
 
@@ -157,8 +157,10 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, MainActivity2.class);
                 startActivities(new Intent[]{intent});
             } else if(!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+                Log.e(TAG,"cam per");
                 Redirct();
             }else {
+                Log.e(TAG,"cam toast");
                 toast("Camera Permission denied");
             }
         } else if (requestCode == LOCATION_PERMISSION_CODE) {
@@ -228,9 +230,6 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-    private void permReq() {
-
-    }
     private void Redirct() {
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle("Alert!");
@@ -245,6 +244,4 @@ public class MainActivity extends AppCompatActivity {
         });
         alertDialog.show();
     }
-
-
 }
