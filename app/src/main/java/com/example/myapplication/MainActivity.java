@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String CHANNEL_ID = "my_channel";
 //    private NotificationManager notificationManager;
 
-    private boolean isPermissionGranted = false;
+//    private boolean isPermissionGranted = false;
     Button locPerm;
 
     FusedLocationProviderClient fusedLocationProviderClient;
@@ -74,7 +74,9 @@ public class MainActivity extends AppCompatActivity {
 
         rLocation = findViewById(R.id.textView2);
 
-//        checkAndRequestPermission();
+        if(checkAndRequestPermission()){
+
+        }
 
         camPerm.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,13 +108,6 @@ public class MainActivity extends AppCompatActivity {
         for (String perm : appPermission){
             if(ContextCompat.checkSelfPermission(this, perm) != PackageManager.PERMISSION_GRANTED){
                 listOfPermissions.add(perm);
-                if (isPermissionGranted) {
-                    Toast.makeText(this, "Open Settings", Toast.LENGTH_SHORT).show();
-                    permReq();
-                } else if (!ActivityCompat.shouldShowRequestPermissionRationale(this, perm)) {
-                    Log.e(TAG, "shouldShowRequestPermissionRationale > ");
-                    isPermissionGranted = true;
-                }
             }
         }
         if(!listOfPermissions.isEmpty()){
@@ -121,24 +116,12 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
-
-
     public void checkPermission(String permission, int requestCode) {
 
         if (ContextCompat.checkSelfPermission(MainActivity.this, permission) == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
-
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
-                Toast.makeText(this, "Open Settings", Toast.LENGTH_SHORT).show();
-                permReq();
-            } else if (!isPermissionGranted) {
-                Log.e(TAG, "shouldShowRequestPermissionRationale > ");
-                isPermissionGranted = true;
-
-            }
+            permReq();
 
         } else {
-//            Toast.makeText(MainActivity.this, "Permission already given", Toast.LENGTH_SHORT).show();
             if (requestCode == CAMERA_PERMISSION_CODE) {
                 Intent intent = new Intent(MainActivity.this, MainActivity2.class);
                 startActivities(new Intent[]{intent});
@@ -193,49 +176,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Log.e(TAG, "onRequestPermissionsResult > " + requestCode + " / " + grantResults.length);
-        if (requestCode == CAMERA_PERMISSION_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //Toast.makeText(MainActivity.this, "Camera Permission Granted", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(MainActivity.this, MainActivity2.class);
-                startActivities(new Intent[]{intent});
-            } else {
-                //Toast.makeText(MainActivity.this, "Camera Permission Denied", Toast.LENGTH_SHORT).show();
-                // permReq();
-            }
-        } else if (requestCode == LOCATION_PERMISSION_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //Toast.makeText(MainActivity.this, "Location Permission Granted", Toast.LENGTH_SHORT).show();
-                getLocation();
-            } else {
-                //Toast.makeText(MainActivity.this, "Location Permission Denied", Toast.LENGTH_SHORT).show();
-                //permReq();
-            }
-        } else if (requestCode == NOTIFICATION_PERMISSION_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //Toast.makeText(MainActivity.this, "Notification Permission Granted", Toast.LENGTH_SHORT).show();
-            } else {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
-
-                    //Toast.makeText(MainActivity.this, "Notification Permission Denied", Toast.LENGTH_SHORT).show();
-                } else {
-                    //Toast.makeText(MainActivity.this, "Notification Permission ASK Manual", Toast.LENGTH_SHORT).show();
-                    //permReq();
-                }
-            }
-        }
-    }
-
     private void toast(String op,String msg) {
         Toast.makeText(this, op + "permission" + msg, Toast.LENGTH_SHORT).show();
     }
 
     private void permReq() {
-
-
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle("Alert!");
         alertDialog.setMessage("Please provide permissions");
@@ -248,7 +193,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
         alertDialog.show();
     }
 
