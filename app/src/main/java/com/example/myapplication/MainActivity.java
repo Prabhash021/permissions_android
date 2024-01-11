@@ -35,6 +35,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int CAMERA_PERMISSION_CODE = 100;
     private static final int LOCATION_PERMISSION_CODE = 101;
     private static final int NOTIFICATION_PERMISSION_CODE = 102;
-    private static final int PERMISSION_CODE = 1024;
+//    private static final int PERMISSION_CODE = 1024;
 
     private static final String CHANNEL_ID = "my_channel";
 //    private NotificationManager notificationManager;
@@ -151,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Log.e(TAG, "onRequestPermissionsResult > " + requestCode + " / " + grantResults.length);
+        Log.e(TAG, "onRequestPermissionsResult > " + requestCode + " / " + Arrays.toString(grantResults));
         if (requestCode == CAMERA_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Intent intent = new Intent(MainActivity.this, MainActivity2.class);
