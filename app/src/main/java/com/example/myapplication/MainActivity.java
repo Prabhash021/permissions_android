@@ -180,7 +180,6 @@ public class MainActivity extends AppCompatActivity {
             }else {
                 toast("Notification Permission denied");
             }
-
         }
     }
 
